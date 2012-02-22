@@ -10,6 +10,8 @@ class Mandos_Core extends Mandos_Dict{
 
     private static $reserved_names = Array('save','destroy','create','init','items','get');
 
+    protected static $indicies = Array();
+
 
     public function __construct($initial_values=Array()){
         self::init($this);
@@ -51,7 +53,16 @@ class Mandos_Core extends Mandos_Dict{
                 if(!self::$collection_name){
                     self::$collection_name = get_class($inst);
                 }
-                self::$collection = self::$db->selectCollection(self::$collection_name);
+        self::$collection = self::$db->selectCollection(self::$collection_name);
+
+        foreach(self::$indicies as $index){
+            if(count($index)>1){
+                $opts = array_splice($index, 1); 
+            }else{
+                $opts = Array();
+            }
+            self::$collection->ensureIndex($index,$opts);
+        }
 
     }
 

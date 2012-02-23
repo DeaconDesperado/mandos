@@ -43,7 +43,7 @@ class Mandos_Core extends Mandos_Dict{
         }
     }
 
-    public static function _remove($args=Array()){
+    private final static function _remove($args=Array()){
         $criteria = (isset($args[0])) ? $args[0] : Array();
         $justOne = (isset($args[1])) ? $args[1] : Array();
         return self::$collection->remove($criteria);
@@ -76,7 +76,7 @@ class Mandos_Core extends Mandos_Dict{
         return static::$name($arguments);
     }
 
-    public static function _find($args=Array()){
+    private final static function _find($args=Array()){
         $criteria = (isset($args[0])) ? $args[0] : Array();
         $fields = (isset($args[1])) ? $args[1] : Array();
         static::init();
@@ -94,7 +94,7 @@ class Mandos_Core extends Mandos_Dict{
         return $output_items;
     }
 
-    public static function _find_one($args=Array()){
+    private final static function _find_one($args=Array()){
         $criteria = (isset($args[0])) ? $args[0] : Array();
         $fields = (isset($args[1])) ? $args[1] : Array();
 

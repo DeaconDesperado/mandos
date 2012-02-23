@@ -14,7 +14,7 @@ class Mandos_Core extends Mandos_Dict{
 
 
     public function __construct($initial_values=Array()){
-        self::init($this);
+        self::init();
         foreach($initial_values as $key=>$val){
             $this->$key = $val;
         }
@@ -47,15 +47,18 @@ class Mandos_Core extends Mandos_Dict{
         return self::$collection->remove($criteria);
     }
 
-    public static function init($inst){
+    public static function init(){
         self::$connection = new Mongo(Kohana::$config->load('mandos.mongouri'));
         self::$db = self::$connection->selectDB(Kohana::$config->load('mandos.db'));
-                if(!self::$collection_name){
-                    self::$collection_name = get_class($inst);
+        $late_name = get_called_class();
+                if(!$late_name::$collection_name){
+                    self::$collection_name = get_called_class();
+                }else{
+                    self::$collection_name = $late_name::$collection_name;
                 }
         self::$collection = self::$db->selectCollection(self::$collection_name);
 
-        foreach(self::$indicies as $index){
+        foreach($late_name::$indicies as $index){
             if(count($index)>1){
                 $opts = array_splice($index, 1); 
             }else{
@@ -67,6 +70,7 @@ class Mandos_Core extends Mandos_Dict{
     }
 
     public static function find($criteria=Array(),$fields=Array()){
+        self::init();
         $saved_items = self::$collection->find($criteria,$fields);
         if($saved_items->count()==0){
             return Array();
@@ -85,6 +89,7 @@ class Mandos_Core extends Mandos_Dict{
     }
 
     public static function find_one($criteria=Array(),$fields=Array()){
+        self::init();
         $object = self::$collection->findOne($criteria,$fields);
         if(!$object){
             return False;

@@ -14,7 +14,7 @@ class Mandos_Core extends Mandos_Dict{
 
 
     public function __construct($initial_values=Array()){
-        self::init();
+        static::init();
         foreach($initial_values as $key=>$val){
             $this->$key = $val;
         }
@@ -43,35 +43,44 @@ class Mandos_Core extends Mandos_Dict{
         }
     }
 
-    public function remove($criteria=Array(),$justOne=False){
+    public static function _remove($args=Array()){
+        $criteria = (isset($args[0])) ? $args[0] : Array();
+        $justOne = (isset($args[1])) ? $args[1] : Array();
         return self::$collection->remove($criteria);
     }
 
     public static function init(){
-        self::$connection = new Mongo(Kohana::$config->load('mandos.mongouri'));
-        self::$db = self::$connection->selectDB(Kohana::$config->load('mandos.db'));
-        $late_name = get_called_class();
-                if(!$late_name::$collection_name){
-                    self::$collection_name = get_called_class();
-                }else{
-                    self::$collection_name = $late_name::$collection_name;
-                }
-        self::$collection = self::$db->selectCollection(self::$collection_name);
+        static::$connection = new Mongo(Kohana::$config->load('mandos.mongouri'));
+        static::$db = static::$connection->selectDB(Kohana::$config->load('mandos.db'));
+        if(!static::$collection_name){
+            static::$collection_name = static::who();
+        }else{
+            static::$collection_name = static::$collection_name;
+        }
+        static::$collection = static::$db->selectCollection(static::$collection_name);
 
-        foreach($late_name::$indicies as $index){
+        foreach(static::$indicies as $index){
             if(count($index)>1){
                 $opts = array_splice($index, 1); 
             }else{
                 $opts = Array();
             }
-            self::$collection->ensureIndex($index,$opts);
+            static::$collection->ensureIndex($index,$opts);
         }
 
     }
 
-    public static function find($criteria=Array(),$fields=Array()){
-        self::init();
-        $saved_items = self::$collection->find($criteria,$fields);
+    public static function __callStatic($name,$arguments){
+        static::init();
+        $name = '_'.$name;
+        return static::$name($arguments);
+    }
+
+    public static function _find($args=Array()){
+        $criteria = (isset($args[0])) ? $args[0] : Array();
+        $fields = (isset($args[1])) ? $args[1] : Array();
+        static::init();
+        $saved_items = static::$collection->find($criteria,$fields);
         if($saved_items->count()==0){
             return Array();
         }
@@ -79,18 +88,18 @@ class Mandos_Core extends Mandos_Dict{
         $class = get_called_class();
         $output_items = Array();
         foreach($saved_items as $item){
-            $output = new $class();
-            foreach($item as $key=>$val){
-                $output->$key = $val;
-            }
+            $output = new $class($item);
             $output_items[] = $output;
         }
         return $output_items;
     }
 
-    public static function find_one($criteria=Array(),$fields=Array()){
-        self::init();
-        $object = self::$collection->findOne($criteria,$fields);
+    public static function _find_one($args=Array()){
+        $criteria = (isset($args[0])) ? $args[0] : Array();
+        $fields = (isset($args[1])) ? $args[1] : Array();
+
+        static::init();
+        $object = static::$collection->findOne($criteria,$fields);
         if(!$object){
             return False;
         }

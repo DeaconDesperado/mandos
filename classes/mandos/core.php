@@ -1,9 +1,9 @@
 <?php
 class Mandos_Core extends Mandos_Dict{
 
-    private static $connection;
-    private static $db;
-    protected static $collection;
+    //private static $connection;
+    //private static $db;
+    //protected static $collection;
 
     protected static $collection_name = FALSE;
     protected static $safe = FALSE;
@@ -25,7 +25,7 @@ class Mandos_Core extends Mandos_Dict{
             $this->_id = new MongoId();
         }
 
-        return self::$collection->update(
+        return static::$config['collection']->update(
                 Array('_id'=>$this->_id),
                 $this->items,
                 Array(
@@ -37,7 +37,7 @@ class Mandos_Core extends Mandos_Dict{
 
     public function destroy($justOne = False){
         if(!empty($this->items)){
-            return self::$collection->remove(Array('_id'=>$this->_id),Array('justOne'=>$justOne));            
+            return static::$config['collection']->remove(Array('_id'=>$this->_id),Array('justOne'=>$justOne));            
         }else{
             throw new Exception('Cannot remove an uninstantiated model object from the mongo collection: no reference.');
         }
@@ -46,32 +46,36 @@ class Mandos_Core extends Mandos_Dict{
     private final static function _remove($args=Array()){
         $criteria = (isset($args[0])) ? $args[0] : Array();
         $justOne = (isset($args[1])) ? $args[1] : Array();
-        return self::$collection->remove($criteria);
+        return static::$config['collection']->remove($criteria);
     }
 
     public static function init(){
-        static::$connection = new Mongo(Kohana::$config->load('mandos.mongouri'));
-        static::$db = static::$connection->selectDB(Kohana::$config->load('mandos.db'));
-        if(!static::$collection_name){
-            static::$collection_name = static::who();
+        static::$config['connection'] = new Mongo(Kohana::$config->load('mandos.mongouri'));
+        static::$config['db'] = static::$config['connection']->selectDB(Kohana::$config->load('mandos.db'));
+        if(!array_key_exists('collection_name',static::$config)){
+            $collection_name = get_called_class();
         }else{
-            static::$collection_name = static::$collection_name;
+            $collection_name = static::$config['collection_name'];
         }
-        static::$collection = static::$db->selectCollection(static::$collection_name);
+        static::$config['collection'] = static::$config['db']->selectCollection($collection_name);
 
-        foreach(static::$indicies as $index){
-            if(count($index)>1){
-                $opts = array_splice($index, 1); 
-            }else{
-                $opts = Array();
+        if(array_key_exists('indicies', static::$config)){
+            foreach(static::$config['indicies'] as $index){
+                if(count($index)>1){
+                    $opts = array_splice($index, 1); 
+                }else{
+                    $opts = Array();
+                }
+                static::$collection->ensureIndex($index,$opts);
             }
-            static::$collection->ensureIndex($index,$opts);
         }
 
     }
 
     public static function __callStatic($name,$arguments){
-        static::init();
+        if(!array_key_exists('collection',static::$config)){
+            static::init();
+        }
         $name = '_'.$name;
         return static::$name($arguments);
     }
@@ -79,8 +83,7 @@ class Mandos_Core extends Mandos_Dict{
     private final static function _find($args=Array()){
         $criteria = (isset($args[0])) ? $args[0] : Array();
         $fields = (isset($args[1])) ? $args[1] : Array();
-        static::init();
-        $saved_items = static::$collection->find($criteria,$fields);
+        $saved_items = static::$config['collection']->find($criteria,$fields);
         if($saved_items->count()==0){
             return Array();
         }
@@ -97,8 +100,9 @@ class Mandos_Core extends Mandos_Dict{
     private final static function _find_one($args=Array()){
         $criteria = (isset($args[0])) ? $args[0] : Array();
         $fields = (isset($args[1])) ? $args[1] : Array();
-
-        static::init();
+        if(!static::$collection){
+            static::init();
+        }
         $object = static::$collection->findOne($criteria,$fields);
         if(!$object){
             return False;
@@ -119,6 +123,16 @@ class Mandos_Core extends Mandos_Dict{
             throw new Exception('Cannot assign instance property '.$key.' of '.get_class($this).': is a reserved word.');
         }
         parent::__set($key,$value);
+    }
+
+    final public function __get($key){
+        if($key == 'collection'){
+            return static::$config['collection'];
+        }else if($key == 'db'){
+            return static::$config['db'];
+        }else{
+            return parent::__get($key);
+        }
     }
 
 }

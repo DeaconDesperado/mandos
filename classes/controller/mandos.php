@@ -12,4 +12,9 @@ class Controller_Mandos extends Controller{
         
     }
 
+    public function action_prop(){
+       echo 'foo';
+       print_r(Testmodel::collection());
+    }
+
 }

@@ -97,6 +97,14 @@ class Mandos_Core extends Mandos_Dict{
         return $output_items;
     }
 
+    private final static function _collection(){
+        return static::$config['collection'];
+    }
+
+    private final static function _db(){
+        return static::$config['db'];
+    }
+
     private final static function _find_one($args=Array()){
         $criteria = (isset($args[0])) ? $args[0] : Array();
         $fields = (isset($args[1])) ? $args[1] : Array();

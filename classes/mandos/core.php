@@ -66,7 +66,7 @@ class Mandos_Core extends Mandos_Dict{
                 }else{
                     $opts = Array();
                 }
-                static::$collection->ensureIndex($index,$opts);
+                static::$config['collection']->ensureIndex($index,$opts);
             }
         }
 

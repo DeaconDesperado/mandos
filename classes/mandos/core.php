@@ -101,10 +101,10 @@ class Mandos_Core extends Mandos_Dict{
     private final static function _find_one($args=Array()){
         $criteria = (isset($args[0])) ? $args[0] : Array();
         $fields = (isset($args[1])) ? $args[1] : Array();
-        if(!static::$collection){
+        if(!array_key_exists('collection',static::$config)){
             static::init();
         }
-        $object = static::$collection->findOne($criteria,$fields);
+        $object = static::$config['collection']->findOne($criteria,$fields);
         if(!$object){
             return False;
         }

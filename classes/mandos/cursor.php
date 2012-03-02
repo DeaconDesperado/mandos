@@ -47,9 +47,9 @@ class Mandos_Cursor implements Iterator{
 
     public function __call($name, $arguments){
         $this->mongo_cursor->reset();
-        call_user_func_array(array($this->mongo_cursor,$name), $arguments);
+        $ret = call_user_func_array(array($this->mongo_cursor,$name), $arguments);
         $this->reindex();
-        return $this;
+        return $ret;
     }
 
 }

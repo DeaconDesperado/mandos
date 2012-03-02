@@ -84,10 +84,14 @@ class Mandos_Core extends Mandos_Dict{
         //TODO:  Implement sorting here
         $criteria = (isset($args[0])) ? $args[0] : Array();
         $fields = (isset($args[1])) ? $args[1] : Array();
-        $saved_items = static::$config['collection']->find($criteria,$fields);
 
         $class = get_called_class();
-        return new Mandos_Cursor($saved_items,$class);
+        return new Mandos_Cursor(static::$config['connection'],
+                                 static::$config['db']->__toString().'.'.static::$config['collection']->getName(),
+                                 $class, 
+                                 $criteria,
+                                 $fields
+                                 );
     }
 
     private final static function _collection(){

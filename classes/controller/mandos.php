@@ -19,7 +19,7 @@ class Controller_Mandos extends Controller{
 
     public function action_cursor(){
         foreach(Testmodel::find()->sort(array('lh_key'=>1)) as $val){
-            echo $val->lh_key;
+            print_r($val);
         }
     }
 

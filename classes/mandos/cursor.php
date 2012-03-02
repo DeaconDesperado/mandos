@@ -45,10 +45,6 @@ class Mandos_Cursor implements Iterator{
         return isset($this->entities[$this->position]);
     }
 
-    public function count($found_only){
-        return $this->mongo_cursor->count();
-    }
-
     public function __call($name, $arguments){
         $this->mongo_cursor->reset();
         call_user_func_array(array($this->mongo_cursor,$name), $arguments);

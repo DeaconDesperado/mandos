@@ -1,17 +1,14 @@
 <?php
 class Mandos_Core extends Mandos_Dict{
 
-    //private static $connection;
-    //private static $db;
-    //protected static $collection;
-
+    //This will be overridden in child classes to link to a collection
     protected static $collection_name = FALSE;
+
+    //TODO: This can be overridden to determine the 'safe' behavior on inserts/updates
     protected static $safe = FALSE;
 
+    //Don't let any child model utilize reserved names for new members
     private static $reserved_names = Array('save','destroy','create','init','items','get');
-
-    protected static $indicies = Array();
-
 
     public function __construct($initial_values=Array()){
         static::init();
@@ -81,7 +78,6 @@ class Mandos_Core extends Mandos_Dict{
     }
 
     private final static function _find($args=Array()){
-        //TODO:  Implement sorting here
         $criteria = (isset($args[0])) ? $args[0] : Array();
         $fields = (isset($args[1])) ? $args[1] : Array();
 

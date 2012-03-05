@@ -7,15 +7,15 @@ in traditional ORMs such as Validation and relationship manangement in favor of 
 with the original MongoDB Drivers.
 
 Think of mandos as an interface that will allow you to attach instance methods directly to the objects you save in your
-mongo collections.
+mongo collections, without having to relearn any new methods that differ from the Mongo driver.
 
 ## Getting started
 
 In order to start attaching methods to your Mongo objects, all you need to do is define an application model that will contain
 the methods and link it to a collection using the `$config` property.
 
-The `$config` property of your new model should be an associative array defining the collection name that will contain the
-instances as well as any indexes that will be ensured on the collection.  The keys are as follows.
+The `$config` property of your new model should be an associative array defining the collection name 
+as well as any indexes that will be ensured on the collection.  The keys are as follows.
 
 + `collection_name` Use this to set the name of the collection in MongoDB that will contain all your instances.  If you do not 
 define this key, the interface will attempt to pluralize your classname and use this as the collection name.
@@ -31,5 +31,49 @@ An example model:
 			'indicies'=>array(
 				array('loc','geo','2d'),
 				array('keywords')
-			)
+			);
 		)
+
+Mandos intentionally preserves the basic approach of the 10gen driver methods wherever possible.  The main difference is that rather
+than retriving associative arrays representing your data, you will instead get your models directly as output.  The original `find` and `findOne`
+methods will return either a single model or an array of models respectively.
+
+	$chicago = Place::findOne(array('city'=>'Chicago','state'=>'IL'));
+	//Assuming we have some methods in the Place class, we can call them directly on this return
+	$chicago->visit();
+
+Keys representing properties in your mongo objects can be fetched using either property accessor or key accessor syntax:
+
+	//These two lines are equivalent
+	$chicago->city;
+	$chicago['city'];
+
+Mandos models can be saved back to their collections by calling the `save()` instance method:
+
+	$chicago->temperature = 55;
+	$chicago->save();
+
+Calling save will trigger an upsert, so new models can be created just by calling the model constructor and then calling `save` on the new instance.
+
+Likewise, an object can be deleted from the collection by calling the `destroy(i)` method
+	
+	$chicago->destroy()
+
+Simple relationships can be established by defining methods that will chain call `find` or `findOne`.  This maps nicely with the Mongo
+philosophy of application defined relations between data models (rather than something more robust in the data tier like you'd find in an RDMS)
+
+	class Event{
+		static $config=array(
+			'collection_name'=>'Events'
+		);
+		
+		public function __construct($inital_vals){
+			parent::__construct($inital_vals);
+			//Let's assume all the event objects have ids linking them to venues in MongoDB.  We
+			//could do a construct-time fetch that will junction the venue data right in at fetch time.
+			$this->Venue = Venue::findOne(array('_id'=>$this->VenueID));
+		}
+	}
+
+So long as your model's constructor maintains chainability back to the parent methods (by taking inital mapping of values for upserts
+and then calling the parent constructor with this mapping) your model will remain in the API.

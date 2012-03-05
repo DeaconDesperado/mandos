@@ -38,12 +38,17 @@ An example model:
 
 Mandos intentionally preserves the basic approach of the 10gen driver methods wherever possible.  The main difference is that rather
 than retriving associative arrays representing your data, you will instead get your models directly as output.  The original `find` and `findOne`
-methods will return either a single model or an array of models respectively.
+methods will return either a cursor containing your models or a single model respectively.
 
 	$chicago = Place::findOne(array('city'=>'Chicago','state'=>'IL'));
 	//Assuming we have some methods in the Place class, we can call them directly on this return
 	$chicago->visit();
 
+Note that find returns a cursor that is compatible with all the original MongoCursor calls
+
+	//find me all the cities alphabetized by name, limit 30 results
+	$places = Place::find()->sort('city'=>1)->limit(30);
+ 
 Keys representing properties in your mongo objects can be fetched using either property accessor or key accessor syntax:
 
 	//These two lines are equivalent
@@ -64,7 +69,7 @@ Likewise, an object can be deleted from the collection by calling the `destroy()
 Simple relationships can be established by defining methods that will chain call `find` or `findOne`.  This maps nicely with the Mongo
 philosophy of application defined relations between data models (rather than something more robust in the data tier like you'd find in an RDBMS)
 
-	class Event{
+	class Event extends Mandos{
 		static $config=array(
 			'collection_name'=>'Events'
 		);

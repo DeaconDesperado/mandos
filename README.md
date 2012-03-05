@@ -61,6 +61,7 @@ Mandos models can be saved back to their collections by calling the `save()` ins
 	$chicago->save();
 
 Calling save will trigger an upsert, so new models can be created just by calling the model constructor and then calling `save` on the new instance.
+If no `_id` property is assigned, the interface will preserve the default driver functionality and generate a new `MongoId` for the object.
 
 Likewise, an object can be deleted from the collection by calling the `destroy()` method
 	

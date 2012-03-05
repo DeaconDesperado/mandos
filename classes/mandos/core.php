@@ -119,6 +119,10 @@ class Mandos_Core extends Mandos_Dict{
 
     }
 
+    private final static function _findOne($args){
+        return self::_find_one($args);
+    }
+
     final public function __set($key,$value){
         if(in_array($key,self::$reserved_names)){
             throw new Exception('Cannot assign instance property '.$key.' of '.get_class($this).': is a reserved word.');

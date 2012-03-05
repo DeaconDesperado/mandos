@@ -8,3 +8,8 @@ with the original MongoDB Drivers.
 
 Think of mandos as an interface that will allow you to attach instance methods directly to the objects you save in your
 mongo collections.
+
+## Getting started
+
+In order to start attaching methods to your Mongo objects, all you need to do is define an application model that will contain
+the methods and link it to a collection using the `$config` property.

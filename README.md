@@ -55,7 +55,7 @@ Mandos models can be saved back to their collections by calling the `save()` ins
 
 Calling save will trigger an upsert, so new models can be created just by calling the model constructor and then calling `save` on the new instance.
 
-Likewise, an object can be deleted from the collection by calling the `destroy(i)` method
+Likewise, an object can be deleted from the collection by calling the `destroy()` method
 	
 	$chicago->destroy()
 
@@ -77,3 +77,6 @@ philosophy of application defined relations between data models (rather than som
 
 So long as your model's constructor maintains chainability back to the parent methods (by taking inital mapping of values for upserts
 and then calling the parent constructor with this mapping) your model will remain in the API.
+
+Credit for the approach goes to <a href="https://github.com/slacy">Steve Lacey's</a> <a href="https://github.com/slacy/minimongo">minimongo</a>, which
+provides similar functionality for Python.

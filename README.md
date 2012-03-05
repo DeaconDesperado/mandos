@@ -1,5 +1,7 @@
 # Mandos Mongo ODM
 
++ Requires php 5.3 and designed for Kohana 3+
+
 Mandos is an intentionally lightweight Object Document Mapper for MongoDB and Kohana 3.
 
 Mandos is designed to be as lightweight as possible and eschews some of the more complicated features
@@ -60,7 +62,7 @@ Likewise, an object can be deleted from the collection by calling the `destroy()
 	$chicago->destroy()
 
 Simple relationships can be established by defining methods that will chain call `find` or `findOne`.  This maps nicely with the Mongo
-philosophy of application defined relations between data models (rather than something more robust in the data tier like you'd find in an RDMS)
+philosophy of application defined relations between data models (rather than something more robust in the data tier like you'd find in an RDBMS)
 
 	class Event{
 		static $config=array(
@@ -77,6 +79,11 @@ philosophy of application defined relations between data models (rather than som
 
 So long as your model's constructor maintains chainability back to the parent methods (by taking inital mapping of values for upserts
 and then calling the parent constructor with this mapping) your model will remain in the API.
+
+In case you need direct access to any model's collection or database, both are available through the static methods `collection()` and `db()` respectively.
+
+	//This will return the MongoCollection instance representing this Model's collection
+	$collection = Event::collection();
 
 Credit for the approach goes to <a href="https://github.com/slacy">Steve Lacey's</a> <a href="https://github.com/slacy/minimongo">minimongo</a>, which
 provides similar functionality for Python.

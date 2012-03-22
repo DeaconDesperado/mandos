@@ -5,7 +5,7 @@ class Mandos_Core extends Mandos_Dict{
     protected static $collection_name = FALSE;
 
     //TODO: This can be overridden to determine the 'safe' behavior on inserts/updates
-    protected static $safe = FALSE;
+    protected static $safe = 0;
 
     //Don't let any child model utilize reserved names for new members
     private static $reserved_names = Array('save','destroy','create','init','items','get');
@@ -21,7 +21,6 @@ class Mandos_Core extends Mandos_Dict{
         if(!$this->_id){
             $this->_id = new MongoId();
         }
-
         return static::$config['collection']->update(
                 Array('_id'=>$this->_id),
                 $this->items,

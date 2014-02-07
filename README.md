@@ -1,4 +1,4 @@
-* No longer actively maintained *
+*No longer actively maintained*
 
 # Mandos Mongo ODM
 

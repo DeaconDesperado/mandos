@@ -1,3 +1,5 @@
+* No longer actively maintained *
+
 # Mandos Mongo ODM
 
 + Requires php 5.3 and designed for Kohana 3+
